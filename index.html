@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BICSAN · Biblioteca Intercultural de Cosmovisiones y Saberes Ancestrales de Nicaragua</title>
+  <meta name="description" content="BICSAN: plataforma para recopilar, preservar y difundir los conocimientos, historias, recetas, danzas, tradiciones y expresiones culturales reales de todos los pueblos de Nicaragua: mískitu, mayangna, rama, garífuna, creole, chorotega, nahoa, sutiaba, matagalpa-cacaopera y mestizo." />
+  <meta name="theme-color" content="#0B5D4B" />
+  <meta property="og:title" content="BICSAN — Saberes Ancestrales de Nicaragua" />
+  <meta property="og:description" content="El archivo cultural de las cuatro regiones de Nicaragua: pueblos, comidas, danzas, leyendas, lugares y lenguas, documentados y en un solo lugar." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_NI" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230B5D4B'/%3E%3Ccircle cx='50' cy='34' r='9' fill='%23FFC300'/%3E%3Cpath d='M28 62L42 38l8 12 6-9 16 21z' fill='%23C0392B'/%3E%3Cpath d='M22 74c12-9 44-9 56 0' fill='none' stroke='%233A86C8' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=bicsan14" />
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+  <!-- ===== Header / Nav ===== -->
+  <header class="site-header" id="top">
+    <div class="container nav-inner">
+      <a href="#top" class="brand" aria-label="BICSAN - inicio">
+        <span class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 100 100" width="40" height="40">
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#0B5D4B"/>
+                <stop offset="1" stop-color="#0e7a63"/>
+              </linearGradient>
+            </defs>
+            <rect width="100" height="100" rx="24" fill="url(#lg)"/>
+            <circle cx="50" cy="34" r="9" fill="#FFC300"/>
+            <path d="M28 62L42 38l8 12 6-9 16 21z" fill="#C0392B" opacity=".92"/>
+            <path d="M22 74c12-9 44-9 56 0" fill="none" stroke="#3A86C8" stroke-width="6" stroke-linecap="round"/>
+            <path d="M30 34a20 20 0 0 1 40 0" fill="none" stroke="#C58B2B" stroke-width="3.5" opacity=".55"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>BICSAN</strong>
+          <em>Saberes Ancestrales de Nicaragua</em>
+        </span>
+      </a>
+
+      <nav class="main-nav" id="mainNav" aria-label="Navegación principal">
+        <a href="#regiones">Regiones</a>
+        <a href="#comunidades">Pueblos</a>
+        <a href="#lugares">Lugares</a>
+        <a href="#costa-caribe">Costa Caribe</a>
+        <a href="#colecciones">Colecciones</a>
+        <a href="calendario.html">Calendario</a>
+        <a href="diccionario.html">Diccionario</a>
+        <a href="trivia.html">Trivia</a>
+        <a href="#contribuir" class="nav-cta">Compartir</a>
+        {% if user.is_authenticated %}
+          <a href="/cuenta/">Mi cuenta</a>
+        {% else %}
+          <a href="/accounts/login/">Ingresar</a>
+        {% endif %}
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">Patrimonio vivo de Nicaragua</p>
+        <h1 class="hero-title">BICSAN</h1>
+        <p class="hero-fullname">Biblioteca Intercultural de Cosmovisiones y Saberes Ancestrales de Nicaragua</p>
+        <p class="hero-tagline">«Preservando la memoria, fortaleciendo la identidad.»</p>
+        <p class="hero-sub">
+          El archivo cultural de las cuatro regiones de Nicaragua: los pueblos, comidas,
+          danzas, leyendas, lugares y lenguas del Caribe Norte, el Caribe Sur, el Pacífico
+          y el Centro-Norte, documentados y en un solo lugar.
+        </p>
+        <div class="hero-actions">
+          <a href="#regiones" class="btn btn-primary">Explorar por regiones</a>
+          <a href="#contribuir" class="btn btn-ghost">Compartir conocimiento</a>
+          <button class="btn btn-ghost" id="btnSorprendeme" type="button">🎲 Sorpréndeme</button>
+        </div>
+
+        <ul class="hero-stats" id="stats">
+          <li><span class="stat-num" data-key="comunidades">0</span><span class="stat-label">Pueblos</span></li>
+          <li><span class="stat-num" data-key="lugares">0</span><span class="stat-label">Lugares</span></li>
+          <li><span class="stat-num" data-key="recetas">0</span><span class="stat-label">Recetas</span></li>
+          <li><span class="stat-num" data-key="danzas">0</span><span class="stat-label">Danzas</span></li>
+          <li><span class="stat-num" data-key="oral">0</span><span class="stat-label">Leyendas</span></li>
+          <li><span class="stat-num" data-key="diccionario">0</span><span class="stat-label">Palabras</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Hoy en BICSAN ===== -->
+    <section class="hoy-strip" aria-label="Destacados de hoy">
+      <div class="container hoy-grid" id="hoyGrid"></div>
+    </section>
+
+    <!-- ===== Intro institucional ===== -->
+    <section class="section intro" id="proposito">
+      <div class="container intro-grid">
+        <div>
+          <p class="kicker">Nuestro propósito</p>
+          <h2 class="section-title">La memoria viva de los pueblos de Nicaragua</h2>
+          <p class="lead">
+            BICSAN recopila, preserva y difunde conocimientos, historias, tradiciones,
+            recetas, danzas, lenguas y expresiones culturales de las comunidades
+            indígenas, afrodescendientes y mestizas de toda Nicaragua.
+          </p>
+          <p>
+            Buscamos fortalecer la identidad cultural, promover el intercambio de saberes y
+            garantizar que las futuras generaciones tengan acceso a la riqueza histórica y
+            cultural de sus pueblos. El contenido aquí reunido es real y documentado, y se
+            construye con el aporte de las comunidades.
+          </p>
+        </div>
+        <ul class="intro-points">
+          <li><span class="dot"></span> Recopilación respetuosa de saberes ancestrales</li>
+          <li><span class="dot"></span> Acceso libre, accesible e inclusivo</li>
+          <li><span class="dot"></span> Conservación de lenguas originarias</li>
+          <li><span class="dot"></span> Construcción colectiva con las comunidades</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Regiones (4, divididas) ===== -->
+    <section class="section" id="regiones" style="padding-bottom: 0">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Un país, cuatro regiones</p>
+          <h2 class="section-title">Explora Nicaragua por regiones</h2>
+          <p class="section-desc">Costa Caribe Norte, Costa Caribe Sur, Pacífico y Centro-Norte: cada una con sus pueblos, lenguas, sabores y paisajes propios.</p>
+        </header>
+        <div class="map-wrap" id="niMap" aria-label="Mapa interactivo de las regiones de Nicaragua"></div>
+      </div>
+      <div class="region-bands" id="regionBands"></div>
+    </section>
+
+    <!-- ===== Costa Caribe 3D + infografias ===== -->
+    <section class="section caribe-studio" id="costa-caribe">
+      <div class="container">
+        <header class="section-head section-head-left">
+          <p class="kicker">Costa Caribe · 3D e infografía</p>
+          <h2 class="section-title">Objetos, alimentos y vida cotidiana en contexto</h2>
+          <p class="section-desc">
+            Una lectura visual de elementos caribeños: cada pieza combina modelo 3D,
+            lámina infográfica y una explicación breve sobre su valor cultural.
+          </p>
+        </header>
+
+        <div class="caribe-shell reveal">
+          <div class="caribe-tabs" role="tablist" aria-label="Elementos de la Costa Caribe">
+            <button class="caribe-tab is-active" id="caribe-tab-tortuga" role="tab" type="button" data-caribe="tortuga" aria-selected="true" aria-controls="caribeStage">
+              <span>Tortuga marina</span><small>Territorio y conservación</small>
+            </button>
+            <button class="caribe-tab" id="caribe-tab-pescado" role="tab" type="button" data-caribe="pescado" aria-selected="false" aria-controls="caribeStage" tabindex="-1">
+              <span>Pescado al coco</span><small>Cocina y memoria</small>
+            </button>
+            <button class="caribe-tab" id="caribe-tab-casa" role="tab" type="button" data-caribe="casa" aria-selected="false" aria-controls="caribeStage" tabindex="-1">
+              <span>Casa miskita</span><small>Arquitectura y clima</small>
+            </button>
+            <button class="caribe-tab" id="caribe-tab-canoa" role="tab" type="button" data-caribe="canoa" aria-selected="false" aria-controls="caribeStage" tabindex="-1">
+              <span>Canoa miskita</span><small>Movilidad y oficio</small>
+            </button>
+          </div>
+
+          <div class="caribe-stage" id="caribeStage" role="tabpanel" aria-labelledby="caribe-tab-tortuga" aria-live="polite">
+            <div class="model-card" aria-label="Modelo 3D interactivo de la Costa Caribe">
+              <model-viewer id="caribeModel"
+                src="assets/models/costa-caribe/pieza-01.glb"
+                alt="Modelo 3D de elemento cultural de la Costa Caribe"
+                camera-controls
+                auto-rotate
+                loading="eager"
+                rotation-per-second="24deg"
+                shadow-intensity="1"
+                exposure=".95"></model-viewer>
+            </div>
+
+            <article class="caribe-note">
+              <span class="caribe-badge" id="caribeBadge">Costa Caribe Norte</span>
+              <h3 id="caribeTitle">Tortuga marina verde</h3>
+              <p id="caribeText">
+                La tortuga verde forma parte de los ciclos marinos y de la conversación comunitaria
+                sobre conservación, turismo responsable y protección de las playas de anidación.
+              </p>
+              <dl class="caribe-facts" id="caribeFacts">
+                <div><dt>Clave cultural</dt><dd>Respeto al mar y a los ciclos de vida.</dd></div>
+                <div><dt>Lectura visual</dt><dd>Hábitat, alimentación, amenazas y protección.</dd></div>
+              </dl>
+            </article>
+          </div>
+
+          <div class="caribe-actions">
+            <button class="btn btn-outline caribe-info-toggle" id="caribeInfoToggle" type="button" aria-expanded="false" aria-controls="caribeInfoFigure">
+              Ver infografía
+            </button>
+          </div>
+
+          <figure class="infografia-card" id="caribeInfoFigure" hidden>
+            <img id="caribeInfoImg" src="assets/infografias/costa-caribe/tortuga-marina-verde.png" alt="Infografía de tortuga marina verde">
+            <figcaption>
+              <strong id="caribeInfoTitle">Lámina: Tortuga marina verde</strong>
+              <span id="caribeInfoCaption">Hábitat, ciclo de vida, amenazas y acciones de protección.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Comunidades / Pueblos ===== -->
+    <section class="section section-alt pattern-tuno" id="comunidades">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Pueblos y territorios</p>
+          <h2 class="section-title">Pueblos y etnias de Nicaragua</h2>
+          <p class="section-desc">Los pueblos originarios, afrodescendientes y mestizos reconocidos por la Constitución: cada uno con sus comidas, danzas, leyendas y palabras.</p>
+        </header>
+        <div class="cards-grid" id="communitiesGrid"></div>
+        <div class="see-all"><a class="btn btn-outline" href="coleccion.html?tipo=pueblos">Ver todos los pueblos →</a></div>
+      </div>
+    </section>
+
+    <!-- ===== Lugares emblemáticos ===== -->
+    <section class="section" id="lugares">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Geografía e identidad</p>
+          <h2 class="section-title">Lugares turísticos y emblemáticos</h2>
+          <p class="section-desc">Ciudades coloniales, islas, volcanes, ríos y reservas que forman el paisaje cultural de Nicaragua.</p>
+        </header>
+        <div class="places-grid" id="placesGrid"></div>
+        <div class="see-all"><a class="btn btn-outline" href="coleccion.html?tipo=lugares">Ver todos los lugares →</a></div>
+      </div>
+    </section>
+
+    <!-- ===== Categorías ===== -->
+    <section class="section section-alt" id="categorias">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Cómo navegar</p>
+          <h2 class="section-title">Categorías principales</h2>
+          <p class="section-desc">Explora el acervo por tipo de conocimiento.</p>
+        </header>
+        <div class="categories-grid" id="categoriesGrid"></div>
+      </div>
+    </section>
+
+    <!-- ===== Colecciones (con pestañas) ===== -->
+    <section class="section pattern-miskitu" id="colecciones">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Acervo digital</p>
+          <h2 class="section-title">Colecciones</h2>
+          <p class="section-desc">Leyendas, recetas, danzas, festividades y documentos reales de todo el país.</p>
+        </header>
+
+        <div class="tabs" role="tablist" aria-label="Colecciones">
+          <button class="tab is-active" role="tab" data-tab="oral" aria-selected="true">Cuentos y Leyendas</button>
+          <button class="tab" role="tab" data-tab="recetas" aria-selected="false">Comidas Típicas</button>
+          <button class="tab" role="tab" data-tab="danzas" aria-selected="false">Danzas y Música</button>
+          <button class="tab" role="tab" data-tab="tradiciones" aria-selected="false">Tradiciones</button>
+          <button class="tab" role="tab" data-tab="documentos" aria-selected="false">Documentos</button>
+        </div>
+
+        <div class="search-row">
+          <input type="search" id="searchInput" class="search-input"
+                 placeholder="Buscar en esta colección…" aria-label="Buscar en la colección" />
+          <span class="search-count" id="searchCount"></span>
+        </div>
+
+        <div class="collection-panel" id="collectionPanel" aria-live="polite"></div>
+        <div class="see-all" id="seeAll"></div>
+      </div>
+    </section>
+
+    <!-- ===== Etiquetas ===== -->
+    <section class="section section-alt" id="etiquetas">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Descubre por temas</p>
+          <h2 class="section-title">Etiquetas</h2>
+        </header>
+        <div class="tag-cloud" id="tagCloud"></div>
+      </div>
+    </section>
+
+    <!-- ===== Línea de tiempo ===== -->
+    <section class="section pattern-tuno" id="historia">
+      <div class="container">
+        <header class="section-head">
+          <p class="kicker">Memoria en el tiempo</p>
+          <h2 class="section-title">Línea de tiempo de nuestros pueblos</h2>
+          <p class="section-desc">De las ciudades coloniales a los reconocimientos de la UNESCO: los hitos documentados que marcan la historia cultural de Nicaragua.</p>
+        </header>
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </section>
+
+    <!-- ===== Misión / Visión ===== -->
+    <section class="section section-dark" id="mision">
+      <div class="container mv-grid">
+        <article class="mv-card">
+          <h3>Misión</h3>
+          <p>
+            Promover la preservación, difusión y fortalecimiento del patrimonio cultural de
+            las comunidades indígenas, afrodescendientes y mestizas mediante herramientas
+            digitales accesibles e inclusivas.
+          </p>
+        </article>
+        <article class="mv-card">
+          <h3>Visión</h3>
+          <p>
+            Ser la principal plataforma digital de referencia para la conservación y
+            promoción de la diversidad cultural de Nicaragua.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== Contribuir / CTA ===== -->
+    <section class="section cta" id="contribuir">
+      <div class="container cta-inner">
+        <h2 class="section-title">Comparte tu conocimiento</h2>
+        <p class="section-desc">
+          ¿Tienes una historia, una receta, una fotografía o un saber que quieras preservar?
+          Tu aporte ayuda a mantener viva la memoria de tu comunidad.
+        </p>
+        {% if user.is_authenticated %}
+        <form class="cta-form" id="contributeForm" action="/api/aportes/" method="post" novalidate>
+          {% csrf_token %}
+          <div class="field">
+            <label for="cName">Nombre</label>
+            <input id="cName" name="name" type="text" required placeholder="Tu nombre" />
+          </div>
+          <div class="field">
+            <label for="cCommunity">Pueblo / Comunidad</label>
+            <select id="cCommunity" name="community" required>
+              <option value="">Selecciona…</option>
+              <option>Mískitu</option>
+              <option>Mayangna/Sumu</option>
+              <option>Rama</option>
+              <option>Garífuna</option>
+              <option>Creole</option>
+              <option>Chorotega</option>
+              <option>Nahoa (Náhuatl)</option>
+              <option>Sutiaba (Xiu)</option>
+              <option>Matagalpa-Cacaopera</option>
+              <option>Mestizo</option>
+            </select>
+          </div>
+          <div class="field field-wide">
+            <label for="cMsg">¿Qué quieres compartir?</label>
+            <textarea id="cMsg" name="message" rows="3" required placeholder="Describe brevemente tu aporte…"></textarea>
+          </div>
+          <div class="field-wide">
+            <button type="submit" class="btn btn-primary">Enviar aporte</button>
+            <p class="form-note" id="formNote" role="status"></p>
+          </div>
+        </form>
+        {% else %}
+        <div class="cta-login">
+          <h3>Inicia sesión para enviar tu aporte</h3>
+          <p>Tu contribución quedará asociada a tu cuenta para que puedas consultar su estado.</p>
+          <div class="cta-login-actions">
+            <a class="btn btn-primary" href="/accounts/signup/?next=/#contribuir">Crear cuenta</a>
+            <a class="btn btn-outline" href="/accounts/login/?next=/#contribuir">Iniciar sesión</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <span class="brand-text">
+          <strong>BICSAN</strong>
+          <em>Biblioteca Intercultural de Cosmovisiones y Saberes Ancestrales de Nicaragua</em>
+        </span>
+        <p>Preservando la memoria, fortaleciendo la identidad de todos los pueblos de Nicaragua.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Explorar">
+        <h4>Explorar</h4>
+        <a href="#regiones">Regiones</a>
+        <a href="#comunidades">Pueblos y Etnias</a>
+        <a href="#lugares">Lugares</a>
+        <a href="#colecciones">Colecciones</a>
+        <a href="diccionario.html">Diccionario</a>
+      </nav>
+      <nav class="footer-nav" aria-label="Institucional">
+        <h4>Proyecto</h4>
+        <a href="#proposito">Propósito</a>
+        <a href="#mision">Misión y Visión</a>
+        <a href="#contribuir">Contribuir</a>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <p>© <span id="year"></span> BICSAN · Biblioteca Intercultural de Cosmovisiones y Saberes Ancestrales de Nicaragua</p>
+      <p><a href="privacidad.html">Privacidad</a> · <a href="terminos.html">Términos</a></p>
+    </div>
+  </footer>
+
+  <script src="assets/js/icons.js?v=bicsan14"></script>
+  <script src="assets/js/data.js?v=bicsan14"></script>
+  <script src="assets/js/core.js?v=bicsan14"></script>
+  <script src="assets/js/app.js?v=bicsan14"></script>
+  <script src="assets/js/caribe-lab.js?v=bicsan14"></script>
+</body>
+</html>

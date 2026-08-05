@@ -1,0 +1,43 @@
+{% extends "account/base_auth.html" %}
+{% load socialaccount %}
+{% block title %}Iniciar sesión{% endblock %}
+{% block content %}
+  <div class="auth-heading">
+    <span class="auth-kicker">Cuenta BICSAN</span>
+    <h1>Bienvenido de nuevo</h1>
+    <p>Inicia sesión para entrar a la biblioteca, explorar el acervo y compartir aportes culturales.</p>
+  </div>
+
+  {% if google_login_enabled %}
+    <form method="post" action="{% provider_login_url 'google' process='login' %}">
+      {% csrf_token %}
+      <button class="google-button" type="submit">
+        <span class="google-mark">G</span> Continuar con Google
+      </button>
+    </form>
+    <div class="auth-divider"><span>o continúa con tu correo</span></div>
+  {% endif %}
+
+  <form class="auth-form" method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      {% if field.name == "remember" %}
+      <label class="auth-check" for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
+      {% else %}
+      <div class="auth-field{% if field.errors %} has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+      </div>
+      {% endif %}
+    {% endfor %}
+    {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <div class="auth-row"><a href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a></div>
+    <button class="auth-submit" type="submit">Iniciar sesión</button>
+  </form>
+
+  <p class="auth-switch">¿Todavía no tienes cuenta? <a href="{% url 'account_signup' %}">Crear cuenta</a></p>
+{% endblock %}

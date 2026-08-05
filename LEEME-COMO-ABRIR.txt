@@ -1,0 +1,21 @@
+BICSAN AHORA USA DJANGO
+=======================
+
+WINDOWS
+1. Instala Python 3.11 o superior desde python.org.
+2. Ejecuta instalar.bat una sola vez.
+3. Ejecuta crear-admin.bat una vez para crear tu usuario administrativo.
+4. Ejecuta iniciar.bat. El navegador se abre automáticamente.
+
+PANEL DEL BACKEND
+Ejecuta abrir-administracion.bat o entra en:
+http://127.0.0.1:8000/admin/
+
+Los aportes quedan guardados permanentemente en db.sqlite3.
+
+IMPORTANTE
+Ya no debes abrir index.html con doble clic. El formulario necesita el servidor
+Django para guardar los aportes correctamente.
+
+Consulta README.md para crear el usuario administrador, mover el proyecto a otra
+computadora o publicarlo.

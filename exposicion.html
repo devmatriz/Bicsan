@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modo Presentación · BICSAN</title>
+  <meta name="description" content="Modo presentación de BICSAN: las fichas culturales de Nicaragua en pantalla completa, ideal para ferias y exposiciones." />
+  <meta name="theme-color" content="#14402F" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230B5D4B'/%3E%3Ccircle cx='50' cy='34' r='9' fill='%23FFC300'/%3E%3Cpath d='M28 62L42 38l8 12 6-9 16 21z' fill='%23C0392B'/%3E%3Cpath d='M22 74c12-9 44-9 56 0' fill='none' stroke='%233A86C8' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=bicsan14" />
+</head>
+<body class="expo-body">
+  <div class="expo" id="expo">
+    <div class="expo-media" id="expoMedia" aria-hidden="true"></div>
+    <div class="expo-velo" aria-hidden="true"></div>
+
+    <header class="expo-top">
+      <span class="expo-brand">BICSAN · Saberes Ancestrales de Nicaragua</span>
+      <a class="expo-salir" href="index.html">Salir ✕</a>
+    </header>
+
+    <div class="expo-cuerpo">
+      <p class="expo-kicker" id="expoKicker"></p>
+      <h1 class="expo-titulo" id="expoTitulo"></h1>
+      <p class="expo-texto" id="expoTexto"></p>
+      <a class="expo-ver btn btn-primary" id="expoVer" href="#">Ver la ficha completa →</a>
+    </div>
+
+    <footer class="expo-controles">
+      <button class="expo-btn" id="expoPrev" aria-label="Anterior">‹</button>
+      <button class="expo-btn expo-play" id="expoPlay" aria-label="Pausar o reanudar">❚❚</button>
+      <button class="expo-btn" id="expoNext" aria-label="Siguiente">›</button>
+      <span class="expo-cont" id="expoCont"></span>
+      <span class="expo-prog"><span id="expoBarra"></span></span>
+    </footer>
+  </div>
+
+  <script src="assets/js/icons.js?v=bicsan14"></script>
+  <script src="assets/js/data.js?v=bicsan14"></script>
+  <script>
+  (function () {
+    "use strict";
+    var DUR = 10000; // 10 segundos por ficha
+    var TIPOS = { recetas: "Comida típica", lugares: "Lugar", oral: "Cuento y leyenda",
+                  danzas: "Danza", tradiciones: "Tradición" };
+    var pool = [];
+    Object.keys(TIPOS).forEach(function (t) {
+      (BDI[t] || []).forEach(function (it) { pool.push({ t: t, it: it }); });
+    });
+    // barajar
+    for (var i = pool.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var x = pool[i]; pool[i] = pool[j]; pool[j] = x;
+    }
+
+    var idx = 0, pausado = false, timer = null, inicio = 0, restante = DUR;
+    var media = document.getElementById("expoMedia");
+    var barra = document.getElementById("expoBarra");
+    var playBtn = document.getElementById("expoPlay");
+
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+    function pintar() {
+      var e = pool[idx], it = e.it;
+      var titulo = it.nombre || it.titulo;
+      document.getElementById("expoKicker").textContent =
+        TIPOS[e.t] + (it.comunidad ? " · " + it.comunidad : it.origen ? " · " + it.origen : it.region ? " · " + it.region : "");
+      document.getElementById("expoTitulo").textContent = titulo;
+      document.getElementById("expoTexto").textContent = (it.texto || it.descripcion || "").slice(0, 220);
+      document.getElementById("expoVer").href = "detalle.html?tipo=" + e.t + "&id=" + encodeURIComponent(it.id);
+      document.getElementById("expoCont").textContent = (idx + 1) + " / " + pool.length;
+
+      media.innerHTML = "";
+      if (it.foto) {
+        var img = new Image();
+        img.src = it.foto;
+        img.onload = function () { media.innerHTML = ""; media.appendChild(img); };
+        img.onerror = function () { fondoIlustracion(it); };
+      } else fondoIlustracion(it);
+
+      reiniciarBarra();
+    }
+
+    function fondoIlustracion(it) {
+      var color = (it.color && it.color[0]) || "#14402F";
+      media.innerHTML = '<div class="expo-illus" style="background:' + esc(color) + '">' +
+        ((window.ICONS && ICONS[it.icon]) || "") + "</div>";
+    }
+
+    function reiniciarBarra() {
+      restante = DUR; inicio = Date.now();
+      barra.style.transition = "none"; barra.style.width = "0%";
+      void barra.offsetWidth;
+      if (!pausado) {
+        barra.style.transition = "width " + DUR + "ms linear";
+        barra.style.width = "100%";
+      }
+      clearTimeout(timer);
+      if (!pausado) timer = setTimeout(siguiente, DUR);
+    }
+
+    function siguiente() { idx = (idx + 1) % pool.length; pintar(); }
+    function anterior() { idx = (idx - 1 + pool.length) % pool.length; pintar(); }
+
+    function alternar() {
+      pausado = !pausado;
+      playBtn.textContent = pausado ? "▶" : "❚❚";
+      if (pausado) {
+        clearTimeout(timer);
+        restante -= (Date.now() - inicio);
+        var pct = ((DUR - restante) / DUR) * 100;
+        barra.style.transition = "none";
+        barra.style.width = pct + "%";
+      } else {
+        inicio = Date.now();
+        barra.style.transition = "width " + restante + "ms linear";
+        barra.style.width = "100%";
+        timer = setTimeout(siguiente, restante);
+      }
+    }
+
+    document.getElementById("expoNext").addEventListener("click", siguiente);
+    document.getElementById("expoPrev").addEventListener("click", anterior);
+    playBtn.addEventListener("click", alternar);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") siguiente();
+      else if (e.key === "ArrowLeft") anterior();
+      else if (e.key === " ") { e.preventDefault(); alternar(); }
+      else if (e.key === "Escape") location.href = "index.html";
+    });
+
+    pintar();
+  })();
+  </script>
+</body>
+</html>

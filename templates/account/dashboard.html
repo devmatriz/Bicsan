@@ -1,0 +1,16 @@
+{% extends "account/base_auth.html" %}
+{% block title %}Mi cuenta{% endblock %}
+{% block content %}
+  <div class="account-top">
+    <div class="account-avatar">{{ user.email|first|upper }}</div>
+    <div><span class="auth-kicker">Mi cuenta</span><h1>{{ user.email }}</h1><p>Miembro desde {{ user.date_joined|date:"d/m/Y" }}</p></div>
+  </div>
+  <div class="account-actions">
+    <a href="/#contribuir">Compartir conocimiento</a>
+    <a href="{% url 'account_email' %}">Administrar correo</a>
+    <a href="{% url 'account_change_password' %}">Cambiar contraseña</a>
+    {% if google_login_enabled %}<a href="{% url 'socialaccount_connections' %}">Conectar cuenta de Google</a>{% endif %}
+  </div>
+  <div class="account-section"><h2>Mis aportes recientes</h2>{% if aportes %}<div class="account-list">{% for aporte in aportes %}<article><strong>{{ aporte.comunidad }}</strong><span>{{ aporte.creado|date:"d/m/Y H:i" }}</span><p>{{ aporte.mensaje|truncatechars:150 }}</p><small>{% if aporte.revisado %}Revisado{% else %}Pendiente de revisión{% endif %}</small></article>{% endfor %}</div>{% else %}<div class="account-empty"><p>Todavía no has enviado aportes.</p><a href="/#contribuir">Compartir mi primer conocimiento</a></div>{% endif %}</div>
+  <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button class="auth-secondary" type="submit">Cerrar sesión</button></form>
+{% endblock %}

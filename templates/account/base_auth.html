@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>{% block title %}Cuenta{% endblock %} · BICSAN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+</head>
+<body>
+  <main class="auth-shell">
+    <a class="auth-brand" href="/" aria-label="Volver a BICSAN">
+      <span class="auth-logo" aria-hidden="true">B</span>
+      <span><strong>BICSAN</strong><small>Saberes Ancestrales de Nicaragua</small></span>
+    </a>
+
+    <section class="auth-card">
+      {% if messages %}
+        <div class="auth-messages">
+          {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </section>
+
+    <p class="auth-back"><a href="/">← Volver a la biblioteca</a></p>
+  </main>
+</body>
+</html>

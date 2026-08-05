@@ -1,0 +1,35 @@
+{% extends "account/base_auth.html" %}
+{% load socialaccount %}
+{% block title %}Crear cuenta{% endblock %}
+{% block content %}
+  <div class="auth-heading">
+    <span class="auth-kicker">Únete a BICSAN</span>
+    <h1>Crea tu cuenta</h1>
+    <p>Participa en la preservación de la memoria cultural de Nicaragua.</p>
+  </div>
+
+  {% if google_login_enabled %}
+    <form method="post" action="{% provider_login_url 'google' process='login' %}">
+      {% csrf_token %}
+      <button class="google-button" type="submit"><span class="google-mark">G</span> Registrarme con Google</button>
+    </form>
+    <div class="auth-divider"><span>o usa tu correo</span></div>
+  {% endif %}
+
+  <form class="auth-form" method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="auth-field{% if field.errors %} has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+        {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+      </div>
+    {% endfor %}
+    {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />{% endif %}
+    <p class="auth-legal">Al crear tu cuenta aceptas usar la plataforma con respeto a los pueblos y sus saberes.</p>
+    <button class="auth-submit" type="submit">Crear mi cuenta</button>
+  </form>
+  <p class="auth-switch">¿Ya tienes cuenta? <a href="{% url 'account_login' %}">Iniciar sesión</a></p>
+{% endblock %}
