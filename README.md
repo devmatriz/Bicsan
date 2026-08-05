@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # BICSAN
 
 Biblioteca Intercultural de Cosmovisiones y Saberes Ancestrales de Nicaragua.
@@ -150,3 +151,7 @@ define los hosts permitidos.
 Para un registro público profesional configura también un servidor SMTP y deja
 `ACCOUNT_EMAIL_VERIFICATION=mandatory`. Así cada nuevo usuario debe verificar su
 correo y puede recuperar su contraseña de forma segura.
+=======
+# cultura-web
+Pagina web sobre las diferentes culturas y la cosmovisión de los pueblos originarios de RACCN
+>>>>>>> 3ae54330a2aa40ccc45968bdaa1edea7f8fd9e16
