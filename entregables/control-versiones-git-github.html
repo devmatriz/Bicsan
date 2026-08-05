@@ -3,21 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Control de versiones con Git y GitHub - BICSAN</title>
+  <title>Control de versiones con Git y GitHub</title>
   <style>
     @page {
       size: A4;
-      margin: 16mm;
-    }
-
-    :root {
-      --ink: #18221e;
-      --muted: #5d6862;
-      --paper: #f8f6ef;
-      --forest: #194d3a;
-      --mint: #dce9df;
-      --line: #cbd4cd;
-      --gold: #b58a3a;
+      margin: 2.54cm;
     }
 
     * {
@@ -26,9 +16,29 @@
 
     body {
       margin: 0;
-      color: var(--ink);
-      background: white;
-      font: 10.5pt/1.5 "Segoe UI", Arial, sans-serif;
+      color: #000;
+      background: #fff;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+
+    .page {
+      min-height: 24.62cm;
+      position: relative;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
 
     h1,
@@ -38,344 +48,208 @@
       margin-top: 0;
     }
 
+    h1,
+    h2,
+    h3 {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+
     h1 {
-      max-width: 145mm;
-      margin-bottom: 7mm;
-      font: 700 29pt/1.08 Georgia, serif;
-      letter-spacing: -0.5pt;
+      margin-bottom: 1.5cm;
+      font-weight: bold;
+      text-transform: uppercase;
     }
 
     h2 {
-      margin-bottom: 4mm;
-      color: var(--forest);
-      font: 700 17pt/1.2 Georgia, serif;
+      margin: 0 0 0.75cm;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
     }
 
     h3 {
-      margin-bottom: 1.5mm;
-      color: var(--forest);
-      font-size: 10.5pt;
-      text-transform: uppercase;
-      letter-spacing: 0.6pt;
+      margin: 0.6cm 0 0.2cm;
+      font-weight: bold;
     }
 
-    code {
-      font-family: Consolas, monospace;
-      font-size: 9pt;
+    p {
+      margin-bottom: 0.5cm;
+      text-align: justify;
     }
 
-    .page {
-      min-height: 265mm;
-      page-break-after: always;
-      position: relative;
+    .cover p {
+      margin-bottom: 0.35cm;
+      text-align: center;
     }
 
-    .page:last-child {
-      page-break-after: auto;
-    }
-
-    .cover {
-      display: flex;
-      min-height: 265mm;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 18mm;
-      color: white;
-      background: var(--forest);
-    }
-
-    .cover::after {
-      width: 36mm;
-      height: 3px;
-      position: absolute;
-      right: 18mm;
-      bottom: 18mm;
-      content: "";
-      background: var(--gold);
-    }
-
-    .eyebrow {
-      margin-bottom: 5mm;
-      color: #bed4c8;
-      font-size: 9pt;
-      font-weight: 700;
-      letter-spacing: 1.6pt;
+    .project {
+      margin-bottom: 3cm;
+      font-weight: bold;
       text-transform: uppercase;
     }
 
-    .cover h1 {
-      color: white;
-    }
-
-    .subtitle {
-      max-width: 125mm;
-      color: #dbe8df;
-      font-size: 13pt;
-    }
-
-    .cover-meta {
-      display: grid;
-      width: 125mm;
-      grid-template-columns: 1fr 1fr;
-      gap: 7mm;
-      padding-top: 8mm;
-      border-top: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .cover-meta span {
-      display: block;
-      color: #a9c5b5;
-      font-size: 8pt;
-      font-weight: 700;
-      letter-spacing: 0.8pt;
-      text-transform: uppercase;
-    }
-
-    .content {
-      padding: 7mm 3mm;
-    }
-
-    .section {
-      margin-bottom: 10mm;
-    }
-
-    .lead {
-      max-width: 155mm;
-      color: var(--muted);
-      font-size: 12pt;
-    }
-
-    .evidence-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4mm;
-    }
-
-    .evidence {
-      min-height: 30mm;
-      padding: 5mm;
-      border-left: 3px solid var(--gold);
-      background: var(--paper);
-    }
-
-    .evidence strong {
-      display: block;
-      margin-bottom: 1mm;
-      color: var(--forest);
-      font-size: 12pt;
-    }
-
-    .evidence p {
-      margin: 0;
-      color: var(--muted);
-      overflow-wrap: anywhere;
+    .date {
+      margin-top: 3cm;
     }
 
     table {
       width: 100%;
+      margin: 0.5cm 0 0.8cm;
       border-collapse: collapse;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
     }
 
     th,
     td {
-      padding: 3mm;
-      border-bottom: 1px solid var(--line);
+      padding: 0.2cm;
+      border: 1px solid #000;
       text-align: left;
       vertical-align: top;
     }
 
     th {
-      color: var(--forest);
-      font-size: 8.5pt;
-      letter-spacing: 0.5pt;
-      text-transform: uppercase;
+      font-weight: bold;
     }
 
-    .steps {
-      margin: 0;
-      padding: 0;
-      counter-reset: steps;
-      list-style: none;
+    ol,
+    ul {
+      margin: 0.3cm 0 0.6cm 1cm;
+      padding-left: 0.5cm;
     }
 
-    .steps li {
-      min-height: 15mm;
-      position: relative;
-      padding: 0 0 3mm 14mm;
-      counter-increment: steps;
+    li {
+      margin-bottom: 0.35cm;
+      text-align: justify;
     }
 
-    .steps li::before {
-      display: grid;
-      width: 9mm;
-      height: 9mm;
-      position: absolute;
-      top: 0;
-      left: 0;
-      place-items: center;
-      border-radius: 50%;
-      content: counter(steps);
-      color: white;
-      background: var(--forest);
-      font-weight: 700;
+    code {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
     }
 
     .command {
-      margin-top: 2mm;
-      padding: 3mm 4mm;
-      border: 1px solid var(--line);
-      color: var(--forest);
-      background: #f4f7f4;
-      white-space: pre-wrap;
-    }
-
-    .note {
-      padding: 5mm;
-      border: 1px solid #b9cabc;
-      background: var(--mint);
+      display: block;
+      margin: 0.15cm 0 0.35cm 0.8cm;
+      font-style: italic;
     }
 
     .footer {
       position: absolute;
-      right: 3mm;
+      right: 0;
       bottom: 0;
-      left: 3mm;
-      padding-top: 3mm;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 8pt;
+      left: 0;
+      margin: 0;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <section class="page cover">
-    <div>
-      <p class="eyebrow">Entregable técnico · Proyecto BICSAN</p>
-      <h1>Control de versiones con Git y GitHub</h1>
-      <p class="subtitle">Registro de la configuración, el historial y el flujo utilizado para conservar los entregables del proyecto.</p>
-    </div>
-    <div class="cover-meta">
-      <p><span>Repositorio</span>devmatriz/Bicsan</p>
-      <p><span>Rama principal</span>main</p>
-      <p><span>Fecha de verificación</span>5 de agosto de 2026</p>
-      <p><span>Plataforma remota</span>GitHub</p>
-    </div>
+    <p class="project">Proyecto BICSAN</p>
+    <h1>Control de versiones con Git y GitHub</h1>
+    <p>Documento técnico del proceso de registro y publicación de entregables</p>
+    <p class="date">5 de agosto de 2026</p>
   </section>
 
-  <section class="page content">
-    <div class="section">
-      <p class="eyebrow">01 · Estado verificado</p>
-      <h2>Evidencia del repositorio</h2>
-      <p class="lead">El proyecto BICSAN dispone de un repositorio Git local conectado a GitHub. Antes de preparar este informe, la rama local se encontraba sincronizada con su rama remota.</p>
-    </div>
+  <section class="page">
+    <h2>Introducción</h2>
+    <p>El control de versiones permite registrar los cambios realizados en un proyecto, consultar versiones anteriores y mantener una copia de respaldo. En el proyecto BICSAN se utilizaron Git para el seguimiento local y GitHub para almacenar el repositorio remoto.</p>
 
-    <div class="section evidence-grid">
-      <article class="evidence">
-        <h3>Repositorio remoto</h3>
-        <strong>origin</strong>
-        <p>https://github.com/devmatriz/Bicsan</p>
-      </article>
-      <article class="evidence">
-        <h3>Rama activa</h3>
-        <strong>main</strong>
-        <p>Seguimiento configurado: origin/main</p>
-      </article>
-      <article class="evidence">
-        <h3>Historial</h3>
-        <strong>3 commits</strong>
-        <p>Versiones registradas antes de este entregable.</p>
-      </article>
-      <article class="evidence">
-        <h3>Estado inicial</h3>
-        <strong>Sin cambios pendientes</strong>
-        <p>Directorio de trabajo limpio y sincronizado.</p>
-      </article>
-    </div>
+    <p>Este documento presenta el estado del repositorio y el procedimiento aplicado para incorporar los entregables. Cada actualización queda identificada mediante un commit y se publica en la rama principal del repositorio.</p>
 
-    <div class="section">
-      <h2>Versión de referencia</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Commit</th>
-            <th>Fecha</th>
-            <th>Autor</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>84bcc89</code></td>
-            <td>05/08/2026 11:39</td>
-            <td>Misael</td>
-            <td>Primer commit</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <h2>Estado del repositorio</h2>
+    <table>
+      <tbody>
+        <tr>
+          <th>Proyecto</th>
+          <td>BICSAN</td>
+        </tr>
+        <tr>
+          <th>Repositorio remoto</th>
+          <td>https://github.com/devmatriz/Bicsan</td>
+        </tr>
+        <tr>
+          <th>Rama principal</th>
+          <td>main</td>
+        </tr>
+        <tr>
+          <th>Remoto configurado</th>
+          <td>origin</td>
+        </tr>
+        <tr>
+          <th>Seguimiento</th>
+          <td>origin/main</td>
+        </tr>
+        <tr>
+          <th>Estado inicial</th>
+          <td>Repositorio local sincronizado con GitHub</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <div class="note">
-      <strong>Resultado:</strong> Git conserva el historial local y GitHub mantiene una copia remota accesible para respaldo, revisión y colaboración.
-    </div>
+    <h2>Versión de referencia</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Commit</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>84bcc89</td>
+          <td>05/08/2026</td>
+          <td>Primer commit</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <p class="footer">Control de versiones · BICSAN · Página 2</p>
+    <p class="footer">2</p>
   </section>
 
-  <section class="page content">
-    <div class="section">
-      <p class="eyebrow">02 · Procedimiento</p>
-      <h2>Flujo para cada entregable</h2>
-      <p class="lead">Cada nueva versión debe registrarse con un mensaje claro y publicarse en GitHub. La fuente editable se conserva junto con el PDF para facilitar futuras actualizaciones.</p>
-    </div>
-
-    <ol class="steps section">
+  <section class="page">
+    <h2>Procedimiento de control de versiones</h2>
+    <ol>
       <li>
-        <h3>Revisar el estado</h3>
-        <div class="command"><code>git status</code></div>
+        Se revisó el estado del repositorio para identificar cambios pendientes.
+        <span class="command"><code>git status</code></span>
       </li>
       <li>
-        <h3>Agregar únicamente los archivos del entregable</h3>
-        <div class="command"><code>git add entregables/</code></div>
+        Se agregaron únicamente los archivos correspondientes al entregable.
+        <span class="command"><code>git add entregables/</code></span>
       </li>
       <li>
-        <h3>Crear una versión identificable</h3>
-        <div class="command"><code>git commit -m "Agrega entregable de control de versiones"</code></div>
+        Se creó un commit con una descripción clara de la actualización.
+        <span class="command"><code>git commit -m "Agrega entregable de control de versiones"</code></span>
       </li>
       <li>
-        <h3>Publicar la versión en GitHub</h3>
-        <div class="command"><code>git push origin main</code></div>
+        Se publicó la nueva versión en la rama principal de GitHub.
+        <span class="command"><code>git push origin main</code></span>
       </li>
       <li>
-        <h3>Comprobar la sincronización</h3>
-        <div class="command"><code>git status --short --branch</code></div>
+        Se comprobó que la rama local quedara sincronizada con el repositorio remoto.
+        <span class="command"><code>git status --short --branch</code></span>
       </li>
     </ol>
 
-    <div class="section">
-      <h2>Criterios aplicados</h2>
-      <table>
-        <tbody>
-          <tr>
-            <th>Trazabilidad</th>
-            <td>Cada entrega queda asociada a un commit, una fecha y un autor.</td>
-          </tr>
-          <tr>
-            <th>Respaldo</th>
-            <td>La versión publicada permanece almacenada en el repositorio remoto de GitHub.</td>
-          </tr>
-          <tr>
-            <th>Recuperación</th>
-            <td>Git permite consultar o recuperar versiones anteriores sin reemplazar el historial.</td>
-          </tr>
-          <tr>
-            <th>Reproducibilidad</th>
-            <td>La fuente HTML permite volver a generar el PDF cuando cambie la información.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <h2>Resultados</h2>
+    <ul>
+      <li>Los archivos del entregable quedaron registrados en el historial de Git.</li>
+      <li>La versión publicada se encuentra respaldada en GitHub.</li>
+      <li>Cada actualización puede identificarse mediante su commit.</li>
+      <li>Las versiones anteriores pueden consultarse o recuperarse cuando sea necesario.</li>
+      <li>La fuente editable se conserva junto con el PDF para facilitar futuras actualizaciones.</li>
+    </ul>
 
-    <p class="footer">Control de versiones · BICSAN · Página 3</p>
+    <h2>Conclusión</h2>
+    <p>El uso conjunto de Git y GitHub permite organizar el desarrollo del proyecto BICSAN y mantener un historial verificable de sus entregables. Este procedimiento facilita el respaldo de la información, la recuperación de versiones y la publicación ordenada de cada actualización.</p>
+
+    <p class="footer">3</p>
   </section>
 </body>
 </html>
