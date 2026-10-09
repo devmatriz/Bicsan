@@ -12,7 +12,7 @@
   --secondary: #A87B2F;
   --secondary-200: #C89B55;
   --accent: #3E6B85;
-  --bg: #FAF9F6;
+  --bg: #ffffff;
   --bg-card: #ffffff;
   --text: #23271F;
   --text-soft: #6B7065;
@@ -146,6 +146,23 @@ a { color: var(--primary); text-decoration: none; }
 .hero-tagline { font-family: var(--serif); font-weight: 600; font-size: clamp(1.15rem,2.4vw,1.5rem); color: var(--primary); margin: 0 0 18px; }
 .hero-sub { font-size: 1.1rem; color: var(--text-soft); max-width: 620px; margin: 0 0 30px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 54px; }
+
+/* Logo grande del hero: panel azul con círculo blanco */
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.hero-visual {
+  aspect-ratio: 1; width: 100%; max-width: 460px; justify-self: end; margin-bottom: 54px;
+  display: grid; place-items: center; border-radius: 14px; overflow: hidden;
+  background: #11385f; box-shadow: var(--shadow-md);
+}
+.hero-logo-circle {
+  width: 72%; aspect-ratio: 1; border-radius: 50%; background: #FAF9F6;
+  display: grid; place-items: center; box-shadow: 0 18px 40px rgba(0,0,0,.25);
+}
+.hero-logo-circle img { width: 68%; height: auto; }
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 8px; }
+  .hero-visual { justify-self: center; max-width: 340px; order: -1; margin-bottom: 36px; }
+}
 
 .hero-stats {
   list-style: none; margin: 0; padding: 26px 0 0;
