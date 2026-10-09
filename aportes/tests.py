@@ -1,8 +1,12 @@
+from allauth.mfa.models import Authenticator
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 
 from .models import Aporte, Comunidad, Region
+from .roles import COLABORADOR, MODERADOR
 
 
 class SitioTests(TestCase):
@@ -10,6 +14,7 @@ class SitioTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username="maria", email="maria@example.com", password="Clave-segura-2026"
         )
+        self.user.groups.add(Group.objects.get(name=COLABORADOR))
     def test_inicio_carga(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 302)
@@ -69,7 +74,7 @@ class SitioTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("crear_aporte"),
-            {"name": "Maria", "community": "Inventada", "message": "Relato"},
+            {"name": "Maria", "community": "Inventada", "message": "Relato comunitario"},
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("community", response.json()["errors"])
@@ -85,7 +90,7 @@ class SitioTests(TestCase):
     def test_aporte_requiere_cuenta(self):
         response = self.client.post(
             reverse("crear_aporte"),
-            {"name": "Ana", "community": "Rama", "message": "Historia"},
+            {"name": "Ana", "community": "Rama", "message": "Historia del pueblo"},
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
@@ -94,3 +99,109 @@ class SitioTests(TestCase):
         response = self.client.get(reverse("salud"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"estado": "ok"})
+
+
+class SeguridadTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.sin_rol = User.objects.create_user(
+            username="sinrol", email="sinrol@example.com", password="Clave-segura-2026"
+        )
+        self.moderador = User.objects.create_user(
+            username="mod", email="mod@example.com", password="Clave-segura-2026"
+        )
+        self.moderador.groups.add(Group.objects.get(name=MODERADOR))
+        self.colaborador = User.objects.create_user(
+            username="colab", email="colab@example.com", password="Clave-segura-2026"
+        )
+        self.colaborador.groups.add(Group.objects.get(name=COLABORADOR))
+        self.aporte = Aporte.objects.create(
+            usuario=self.colaborador,
+            nombre="Colab",
+            comunidad=Comunidad.objects.get(nombre="Rama"),
+            mensaje="Historia del pueblo rama",
+        )
+
+    def activar_2fa(self, user):
+        Authenticator.objects.create(user=user, type=Authenticator.Type.TOTP, data={"secret": "x"})
+
+    def test_roles_creados_con_permisos(self):
+        colaborador = Group.objects.get(name=COLABORADOR)
+        moderador = Group.objects.get(name=MODERADOR)
+        self.assertTrue(colaborador.permissions.filter(codename="add_aporte").exists())
+        self.assertFalse(colaborador.permissions.filter(codename="revisar_aporte").exists())
+        self.assertTrue(moderador.permissions.filter(codename="revisar_aporte").exists())
+
+    def test_registro_asigna_rol_colaborador(self):
+        response = self.client.post(
+            reverse("account_signup"),
+            {"email": "nuevo@example.com", "password1": "Clave-segura-2026", "password2": "Clave-segura-2026"},
+        )
+        self.assertEqual(response.status_code, 302)
+        nuevo = get_user_model().objects.get(email="nuevo@example.com")
+        self.assertTrue(nuevo.groups.filter(name=COLABORADOR).exists())
+
+    def test_usuario_sin_permiso_no_envia_aportes(self):
+        self.client.force_login(self.sin_rol)
+        response = self.client.post(
+            reverse("crear_aporte"),
+            {"name": "X", "community": "Rama", "message": "Historia del pueblo"},
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_rechaza_textos_muy_cortos(self):
+        self.client.force_login(self.colaborador)
+        response = self.client.post(
+            reverse("crear_aporte"), {"name": "A", "community": "Rama", "message": "corto"}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(set(response.json()["errors"]), {"name", "message"})
+
+    def test_colaborador_no_puede_moderar(self):
+        self.client.force_login(self.colaborador)
+        response = self.client.get(reverse("moderacion"))
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(response, "Acceso denegado", status_code=403)
+
+    def test_moderador_sin_2fa_es_enviado_a_activarlo(self):
+        self.client.force_login(self.moderador)
+        response = self.client.get(reverse("moderacion"))
+        self.assertRedirects(response, reverse("mfa_index"), fetch_redirect_response=False)
+
+    def test_moderador_con_2fa_revisa_aporte(self):
+        self.activar_2fa(self.moderador)
+        self.client.force_login(self.moderador)
+        response = self.client.get(reverse("moderacion"))
+        self.assertContains(response, "Historia del pueblo rama")
+        response = self.client.post(reverse("marcar_revisado", args=[self.aporte.pk]))
+        self.assertRedirects(response, reverse("moderacion"), fetch_redirect_response=False)
+        self.aporte.refresh_from_db()
+        self.assertTrue(self.aporte.revisado)
+        self.assertEqual(self.aporte.revisado_por, self.moderador)
+
+    def test_marcar_revisado_solo_por_post(self):
+        self.activar_2fa(self.moderador)
+        self.client.force_login(self.moderador)
+        response = self.client.get(reverse("marcar_revisado", args=[self.aporte.pk]))
+        self.assertEqual(response.status_code, 405)
+
+    def test_admin_usa_login_con_2fa(self):
+        response = self.client.get("/admin/")
+        self.assertEqual(response.status_code, 302)
+        response = self.client.get(response.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_pagina_404_personalizada(self):
+        response = self.client.get("/no-existe.html")
+        self.assertContains(response, "Página no encontrada", status_code=404)
+
+    def test_paginas_2fa_cargan(self):
+        self.client.force_login(self.colaborador)
+        self.assertEqual(self.client.get(reverse("mfa_index")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("cuenta")).status_code, 200)
+
+    def test_sesion_expira_por_inactividad(self):
+        self.assertEqual(settings.SESSION_COOKIE_AGE, 1800)
+        self.assertTrue(settings.SESSION_SAVE_EVERY_REQUEST)
+        self.assertTrue(settings.SESSION_EXPIRE_AT_BROWSER_CLOSE)

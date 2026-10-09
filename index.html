@@ -336,7 +336,7 @@
           {% csrf_token %}
           <div class="field">
             <label for="cName">Nombre</label>
-            <input id="cName" name="name" type="text" required placeholder="Tu nombre" />
+            <input id="cName" name="name" type="text" required minlength="2" maxlength="120" autocomplete="name" placeholder="Tu nombre" />
           </div>
           <div class="field">
             <label for="cCommunity">Pueblo / Comunidad</label>
@@ -356,7 +356,7 @@
           </div>
           <div class="field field-wide">
             <label for="cMsg">¿Qué quieres compartir?</label>
-            <textarea id="cMsg" name="message" rows="3" required placeholder="Describe brevemente tu aporte…"></textarea>
+            <textarea id="cMsg" name="message" rows="3" required minlength="10" maxlength="5000" placeholder="Describe brevemente tu aporte…"></textarea>
           </div>
           <div class="field-wide">
             <button type="submit" class="btn btn-primary">Enviar aporte</button>

@@ -338,8 +338,12 @@
   if (form && note) form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) {
+      const invalido = form.querySelector(":invalid");
       note.style.color = "#b5462b";
-      note.textContent = "Por favor completa todos los campos.";
+      note.textContent = invalido && invalido.validationMessage
+        ? `${invalido.labels[0]?.textContent || "Campo"}: ${invalido.validationMessage}`
+        : "Por favor completa todos los campos.";
+      if (invalido) invalido.focus();
       return;
     }
     const name = $("#cName").value.trim();
@@ -354,13 +358,16 @@
         body: new FormData(form),
         headers: { "X-Requested-With": "XMLHttpRequest" }
       });
-      const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error("No se pudo guardar el aporte.");
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) {
+        const errores = Object.values(result.errors || {});
+        throw new Error(errores.length ? errores.join(" ") : "No fue posible enviar el aporte. Inténtalo nuevamente.");
+      }
       note.textContent = `¡Gracias, ${name}! Tu aporte fue recibido. Pronto un gestor cultural lo revisará. 🌿`;
       form.reset();
     } catch (error) {
       note.style.color = "#b5462b";
-      note.textContent = "No fue posible enviar el aporte. Inténtalo nuevamente.";
+      note.textContent = error.message || "No fue posible enviar el aporte. Inténtalo nuevamente.";
     } finally {
       button.disabled = false;
     }
