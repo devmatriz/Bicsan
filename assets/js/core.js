@@ -73,17 +73,8 @@
      </div>`;
 
   /* ---------- Logo BICSAN ---------- */
-  const logoSVG = (size) => `
-    <svg viewBox="0 0 100 100" width="${size}" height="${size}">
-      <defs><linearGradient id="lgh${size}" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#0B5D4B"/><stop offset="1" stop-color="#0e7a63"/>
-      </linearGradient></defs>
-      <rect width="100" height="100" rx="24" fill="url(#lgh${size})"/>
-      <circle cx="50" cy="34" r="9" fill="#FFC300"/>
-      <path d="M28 62L42 38l8 12 6-9 16 21z" fill="#C0392B" opacity=".92"/>
-      <path d="M22 74c12-9 44-9 56 0" fill="none" stroke="#3A86C8" stroke-width="6" stroke-linecap="round"/>
-      <path d="M30 34a20 20 0 0 1 40 0" fill="none" stroke="#C58B2B" stroke-width="3.5" opacity=".55"/>
-    </svg>`;
+  const logoSVG = (size) =>
+    `<img src="assets/img/logo.svg?v=2" width="${size}" height="${size}" alt="">`;
 
   /* ---------- Encabezado y pie compartidos ---------- */
   function headerHTML(activeTipo) {

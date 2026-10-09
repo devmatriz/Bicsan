@@ -5,7 +5,7 @@ body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity
 a { color:var(--green); font-weight:700; text-decoration:none; }
 .auth-shell { position:relative; width:min(480px,calc(100% - 32px)); margin:0 auto; padding:48px 0 32px; }
 .auth-brand { display:flex; justify-content:center; align-items:center; gap:12px; color:var(--ink); margin-bottom:24px; }
-.auth-logo { display:grid; place-items:center; width:46px; height:46px; border-radius:13px; color:#fff; background:var(--green); font:800 25px "Barlow Condensed",sans-serif; box-shadow:0 8px 20px rgba(11,93,75,.25); }
+.auth-logo { display:block; width:52px; height:52px; }
 .auth-brand strong,.auth-brand small { display:block; }.auth-brand strong { font:800 22px "Barlow Condensed",sans-serif; letter-spacing:.08em; }.auth-brand small { color:var(--muted); font-size:12px; font-weight:500; }
 .auth-card { padding:38px; background:rgba(255,255,255,.96); border:1px solid rgba(11,93,75,.12); border-radius:20px; box-shadow:0 24px 70px rgba(29,61,49,.14); }
 .auth-heading { margin-bottom:26px; }.auth-kicker { color:var(--gold); font-size:12px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }.auth-heading h1,.account-top h1 { margin:4px 0 8px; font:800 35px/1.05 "Barlow Condensed",sans-serif; color:var(--green-dark); }.auth-heading p,.account-top p { margin:0; color:var(--muted); line-height:1.55; }

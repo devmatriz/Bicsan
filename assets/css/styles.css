@@ -98,8 +98,10 @@ a { color: var(--primary); text-decoration: none; }
 }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; min-height: 72px; }
 
-.brand { display: flex; align-items: center; gap: 12px; }
-.brand-logo { display: inline-flex; filter: drop-shadow(0 4px 8px rgba(11,93,75,.18)); }
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand-logo { display: inline-flex; flex-shrink: 0; }
+.brand-logo img { display: block; }
+@media (min-width: 721px) and (max-width: 1500px) { .site-header .brand-text em { display: none; } }
 .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-text strong { font-family: var(--serif); font-weight: 600; color: var(--primary-700); font-size: 1.02rem; }
 .brand-text em { font-style: normal; color: var(--secondary); font-size: .82rem; letter-spacing: .04em; }
