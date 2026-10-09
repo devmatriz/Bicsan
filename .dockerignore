@@ -1,0 +1,17 @@
+# Nada de secretos, bases locales ni entornos virtuales dentro de la imagen.
+.env
+.git
+.githooks
+.venv
+__pycache__/
+*.py[cod]
+db.sqlite3
+db.sqlite3.*
+staticfiles/
+docs/
+*.bat
+LEEME-COMO-ABRIR.txt
+render.yaml
+build.sh
+docker-compose.yml
+docker/nginx/

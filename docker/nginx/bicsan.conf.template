@@ -1,0 +1,71 @@
+# Proxy inverso de BICSAN. La imagen oficial de Nginx reemplaza ${DOMINIO} al arrancar.
+
+types {
+    model/gltf-binary glb;
+}
+
+upstream bicsan_app {
+    server web:8000;
+}
+
+# HTTP: solo redirige a HTTPS (y responde la comprobación interna de salud).
+server {
+    listen 80;
+    server_name ${DOMINIO};
+
+    location = /nginx-salud {
+        access_log off;
+        return 200 "ok\n";
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${DOMINIO};
+
+    ssl_certificate     /etc/letsencrypt/live/${DOMINIO}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMINIO}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+
+    server_tokens off;
+    client_max_body_size 5m;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "same-origin" always;
+
+    # Compresión de las respuestas generadas por Django (HTML y JSON).
+    gzip on;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_vary on;
+    gzip_types text/css application/javascript application/json image/svg+xml model/gltf-binary;
+
+    # Archivos estáticos servidos por Nginx sin pasar por Django.
+    # gzip_static entrega las versiones .gz que WhiteNoise genera en collectstatic.
+    location /assets/ {
+        alias /var/www/bicsan/assets/;
+        gzip_static on;
+        expires 30d;
+        add_header Cache-Control "public";
+        add_header X-Content-Type-Options "nosniff" always;
+        access_log off;
+    }
+
+    location / {
+        proxy_pass http://bicsan_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+}
