@@ -7,7 +7,7 @@ pueblos, comidas, danzas, leyendas, lugares y lenguas.
 
 | | |
 |---|---|
-| **Producción** | _pendiente: agrega aquí la URL de Render cuando esté publicado_ |
+| **Producción** | _pendiente: agrega aquí la URL de Azure cuando esté publicado_ |
 | **Repositorio** | <https://github.com/devmatriz/Bicsan> |
 | **Licencia** | Ver [`LICENSE`](LICENSE) |
 | **Documentación técnica** | [`docs/`](docs/README.md): modelo ER y diagramas UML |
@@ -74,20 +74,22 @@ flowchart LR
 | Autenticación | django-allauth 65 (correo, Google OAuth 2.0, 2FA) |
 | Base de datos | SQLite en desarrollo · PostgreSQL en producción |
 | Frontend | HTML5, CSS3, JavaScript sin frameworks · `<model-viewer>` para modelos 3D |
-| Servidor | Gunicorn (Linux/Render) · Waitress (Windows) |
-| Alojamiento | Render (`render.yaml`) |
+| Servidor | Gunicorn detrás de Nginx (proxy inverso) · Waitress (Windows) |
+| Contenedores | Docker + Docker Compose (`db`, `web`, `nginx`) |
+| Alojamiento | Máquina virtual Ubuntu en Azure · alternativa: Render (`render.yaml`) |
 
 **Dependencias de Python** (`requirements.txt`):
 
 | Paquete | Para qué se usa |
 |---|---|
 | `Django` | Framework web: rutas, vistas, ORM, plantillas, admin y seguridad. |
+| `django-cors-headers` | Controla qué orígenes externos pueden llamar a `/api/` (CORS). |
 | `django-allauth[socialaccount,mfa]` | Registro, login por correo, verificación, recuperación de contraseña, login con Google y verificación en dos pasos (TOTP). Instala `qrcode` y `fido2`. |
 | `dj-database-url` | Convierte la variable `DATABASE_URL` en la configuración de base de datos. |
 | `psycopg[binary]` | Controlador para PostgreSQL en producción. |
 | `gunicorn` | Servidor WSGI de producción en Linux. |
 | `waitress` | Servidor WSGI alternativo que funciona en Windows. |
-| `whitenoise` | Sirve los archivos estáticos comprimidos sin necesidad de Nginx. |
+| `whitenoise` | Genera versiones comprimidas (gzip) de los estáticos; Nginx las entrega en producción. |
 | `python-dotenv` | Lee las variables del archivo `.env` en desarrollo. |
 
 **Dependencias del navegador** (por CDN): Google Fonts (Barlow Condensed y
@@ -133,8 +135,11 @@ assets/                      Archivos estáticos (se publican en /assets/)
 
 *.html                       Páginas del sitio (index, region, pueblo, detalle, colección,
                              diccionario, calendario, trivia, exposición, acerca, privacidad, términos)
-docs/                        Modelo ER y diagramas UML
-render.yaml, build.sh        Despliegue en Render
+docs/                        Modelo ER, diagramas UML y guía de despliegue en Azure
+Dockerfile, .dockerignore    Imagen de producción (usuario sin privilegios)
+docker-compose.yml           Servicios db (PostgreSQL), web (Django) y nginx
+docker/                      entrypoint.sh, configuración de Nginx y monitoreo.sh
+render.yaml, build.sh        Despliegue alternativo en Render
 *.bat                        Instalación y arranque en Windows
 ```
 
@@ -166,7 +171,7 @@ Diagrama completo, justificación de la 3FN y diagramas UML en [`docs/`](docs/RE
 | Método | Ruta | Acceso | Descripción | Respuestas |
 |---|---|---|---|---|
 | `POST` | `/api/aportes/` | Sesión + permiso `aportes.add_aporte` + token CSRF | Crea un aporte cultural. | `201` creado · `400` errores de validación · `403` sin permiso · `302` sin sesión · `405` otro método |
-| `GET` | `/api/salud/` | Público | Comprobación de salud usada por Render. | `200 {"estado": "ok"}` |
+| `GET` | `/api/salud/` | Público | Comprobación de salud usada por Docker, el monitoreo y Render. | `200 {"estado": "ok"}` |
 
 **Ejemplo `POST /api/aportes/`** (formulario `multipart/form-data` o `x-www-form-urlencoded`):
 
@@ -241,6 +246,8 @@ en **Grupos** agregar *Moderador* → Guardar.
 | **Roles y permisos** | Grupos de Django; las vistas usan `login_required`, `permission_required` y el decorador `requiere_2fa`. |
 | **Validación de datos** | En el navegador (`required`, `minlength`, `maxlength`) y en el servidor (`aportes/views.py`); la comunidad debe existir en el catálogo. |
 | CSRF | Token en todos los formularios y en el `fetch` del formulario de aportes. |
+| **CORS** | `django-cors-headers` solo actúa sobre `/api/` y únicamente responde a los orígenes de `CORS_ALLOWED_ORIGINS`; sin configurar, ningún sitio externo puede leer la API. |
+| **Servidor y contenedores** | Usuario estándar `azureuser` con clave SSH (sin `root` ni contraseña), UFW, fail2ban y parches automáticos; la app corre como usuario `bicsan` en su contenedor; solo Nginx expone puertos y PostgreSQL vive en una red interna. |
 | HTTPS | En producción: redirección a HTTPS, HSTS de 1 año, cookies seguras. |
 | Cabeceras | `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`, `X-Content-Type-Options: nosniff`. |
 | **Manejo de errores** | Páginas 403/404/500 propias, respuestas JSON con códigos HTTP correctos, captura de errores de base de datos y registro (`LOGGING`) de eventos de seguridad. |
@@ -250,8 +257,8 @@ en **Grupos** agregar *Moderador* → Guardar.
 
 ## 8. Variables de entorno
 
-Copia `.env.example` como `.env` para desarrollo. En producción se configuran en
-el panel del alojamiento.
+Copia `.env.example` como `.env` para desarrollo. En Azure, el archivo `.env`
+vive solo en el servidor (`chmod 600`) y Docker Compose lo entrega a los contenedores.
 
 | Variable | Obligatoria en producción | Valor por defecto | Descripción |
 |---|---|---|---|
@@ -259,7 +266,9 @@ el panel del alojamiento.
 | `DJANGO_DEBUG` | Sí (`false`) | `true` | Modo de depuración. |
 | `DJANGO_ALLOWED_HOSTS` | Sí* | `localhost,127.0.0.1` | Dominios permitidos, separados por comas. |
 | `CSRF_TRUSTED_ORIGINS` | Sí* | vacío | Orígenes HTTPS de confianza, ej. `https://bicsan.org`. |
-| `DATABASE_URL` | Sí | SQLite local | URL de PostgreSQL: `postgres://usuario:clave@host:5432/bicsan`. |
+| `DATABASE_URL` | Sí | SQLite local | URL de PostgreSQL: `postgres://usuario:clave@host:5432/bicsan`. En Docker la arma `docker-compose.yml`. |
+| `DATABASE_SSL_REQUIRE` | No | `true` en producción | Exige SSL hacia PostgreSQL. Docker lo pone en `false` (red interna). |
+| `CORS_ALLOWED_ORIGINS` | No | vacío (solo el propio dominio) | Orígenes externos que pueden llamar a `/api/`, ej. `https://app.ejemplo.com`. |
 | `ACCOUNT_EMAIL_VERIFICATION` | No | `none` en desarrollo, `mandatory` en producción | `none`, `optional` o `mandatory`. |
 | `SESSION_COOKIE_AGE` | No | `1800` | Segundos de inactividad antes de cerrar la sesión. |
 | `GOOGLE_CLIENT_ID` | No | vacío | ID del cliente OAuth de Google. |
@@ -270,6 +279,8 @@ el panel del alojamiento.
 | `EMAIL_USE_TLS` | No | `true` | Usa TLS con el servidor SMTP. |
 | `DEFAULT_FROM_EMAIL` | Sí | `BICSAN <no-reply@localhost>` | Remitente de los correos. |
 | `RENDER_EXTERNAL_HOSTNAME` | — | — | La define Render; se agrega sola a hosts y orígenes. |
+| `DOMINIO` | Sí (Docker) | — | Dominio público del servidor; lo usan Nginx y el certificado HTTPS. |
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | Sí (Docker) | — | Crean la base del contenedor PostgreSQL. |
 
 \* En Render no hace falta si usas el dominio `*.onrender.com`.
 
@@ -324,6 +335,28 @@ sesión.
 ---
 
 ## 11. Despliegue en producción
+
+### Azure con Docker (principal)
+
+BICSAN corre en una máquina virtual Ubuntu de Azure con tres contenedores:
+
+- **nginx**: proxy inverso, único servicio expuesto (80/443), HTTPS con Let's Encrypt,
+  gzip y caché de los archivos estáticos.
+- **web**: Django + Gunicorn con un usuario sin privilegios; al arrancar ejecuta
+  `collectstatic` y `migrate`.
+- **db**: PostgreSQL 16 en una red interna sin salida a internet.
+
+```bash
+cp .env.example .env && nano .env    # secretos solo en el servidor
+docker compose up -d --build
+docker compose exec web python manage.py createsuperuser
+./docker/monitoreo.sh                # estado, consumo y salud
+```
+
+La guía paso a paso (VM, seguridad del servidor, HTTPS, monitoreo y evidencia de
+cada entregable) está en [`docs/despliegue-azure.md`](docs/despliegue-azure.md).
+
+### Render (alternativa)
 
 El proyecto incluye `render.yaml` (Blueprint de Render), que crea:
 
