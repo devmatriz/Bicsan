@@ -2,7 +2,7 @@ from allauth.mfa.models import Authenticator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import Aporte, Comunidad, Region
@@ -205,3 +205,11 @@ class SeguridadTests(TestCase):
         self.assertEqual(settings.SESSION_COOKIE_AGE, 1800)
         self.assertTrue(settings.SESSION_SAVE_EVERY_REQUEST)
         self.assertTrue(settings.SESSION_EXPIRE_AT_BROWSER_CLOSE)
+
+    @override_settings(CORS_ALLOWED_ORIGINS=["https://app.ejemplo.com"])
+    def test_cors_solo_permite_origenes_configurados(self):
+        response = self.client.get(reverse("salud"), HTTP_ORIGIN="https://app.ejemplo.com")
+        self.assertEqual(response["Access-Control-Allow-Origin"], "https://app.ejemplo.com")
+
+        response = self.client.get(reverse("salud"), HTTP_ORIGIN="https://sitio-ajeno.com")
+        self.assertNotIn("Access-Control-Allow-Origin", response)

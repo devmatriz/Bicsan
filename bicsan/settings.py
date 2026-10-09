@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "allauth.mfa",
+    "corsheaders",
     "aportes",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -85,7 +87,10 @@ if DATABASE_URL:
         DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
-        ssl_require=not DEBUG,
+        # En Docker la base va por una red interna sin salida a internet, sin SSL.
+        ssl_require=os.environ.get(
+            "DATABASE_SSL_REQUIRE", "false" if DEBUG else "true"
+        ).lower() in {"1", "true", "yes", "si"},
     )
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -173,6 +178,17 @@ if RENDER_EXTERNAL_HOSTNAME:
     render_origin = f"https://{RENDER_EXTERNAL_HOSTNAME}"
     if render_origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(render_origin)
+
+# CORS: por defecto solo el propio dominio puede llamar a la API desde el navegador.
+# Para permitir otro frontend, agrega su origen exacto (https://...) en CORS_ALLOWED_ORIGINS.
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+CORS_URLS_REGEX = r"^/api/.*$"
+CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
+CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = not DEBUG
