@@ -1,3 +1,7 @@
 # Los hooks de Git son scripts de shell y necesitan finales de linea LF.
 .githooks/* text eol=lf
 *.sh text eol=lf
+
+# Archivos que se ejecutan en Linux (Docker y el servidor de Azure).
+*.template text eol=lf
+Dockerfile text eol=lf
