@@ -1,0 +1,25 @@
+{% extends "account/base_auth.html" %}
+{% block title %}Moderación{% endblock %}
+{% block content %}
+  <div class="auth-heading">
+    <span class="auth-kicker">Rol Moderador</span>
+    <h1>Aportes pendientes</h1>
+    <p>Revisa cada aporte antes de publicarlo en la biblioteca.</p>
+  </div>
+  {% for aporte in pendientes %}
+    <article class="mod-item">
+      <header>
+        <strong>{{ aporte.nombre }} · {{ aporte.comunidad }}{% if aporte.comunidad.region %} ({{ aporte.comunidad.region }}){% endif %}</strong>
+        <span>{{ aporte.creado|date:"d/m/Y H:i" }} · {{ aporte.usuario.email|default:"cuenta eliminada" }}</span>
+      </header>
+      <p>{{ aporte.mensaje }}</p>
+      <form method="post" action="{% url 'marcar_revisado' aporte.pk %}">
+        {% csrf_token %}
+        <button class="auth-submit" type="submit">Marcar como revisado</button>
+      </form>
+    </article>
+  {% empty %}
+    <div class="account-empty"><p>No hay aportes pendientes. ¡Todo al día!</p></div>
+  {% endfor %}
+  <p class="auth-switch"><a href="{% url 'cuenta' %}">← Volver a mi cuenta</a></p>
+{% endblock %}

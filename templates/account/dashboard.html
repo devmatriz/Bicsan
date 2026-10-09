@@ -5,10 +5,18 @@
     <div class="account-avatar">{{ user.email|first|upper }}</div>
     <div><span class="auth-kicker">Mi cuenta</span><h1>{{ user.email }}</h1><p>Miembro desde {{ user.date_joined|date:"d/m/Y" }}</p></div>
   </div>
+  <div class="account-badges">
+    {% if user.is_superuser %}<span>Administrador</span>{% endif %}
+    {% for rol in roles %}<span>{{ rol }}</span>{% endfor %}
+    {% if mfa_activo %}<span>2FA activo</span>{% else %}<span class="warn">2FA desactivado</span>{% endif %}
+  </div>
   <div class="account-actions">
     <a href="/#contribuir">Compartir conocimiento</a>
     <a href="{% url 'account_email' %}">Administrar correo</a>
     <a href="{% url 'account_change_password' %}">Cambiar contraseña</a>
+    <a href="{% url 'mfa_index' %}">Verificación en dos pasos (2FA)</a>
+    {% if perms.aportes.revisar_aporte %}<a href="{% url 'moderacion' %}">Moderar aportes</a>{% endif %}
+    {% if user.is_staff %}<a href="/admin/">Panel de administración</a>{% endif %}
     {% if google_login_enabled %}<a href="{% url 'socialaccount_connections' %}">Conectar cuenta de Google</a>{% endif %}
   </div>
   <div class="account-section"><h2>Mis aportes recientes</h2>{% if aportes %}<div class="account-list">{% for aporte in aportes %}<article><strong>{{ aporte.comunidad }}</strong><span>{{ aporte.creado|date:"d/m/Y H:i" }}</span><p>{{ aporte.mensaje|truncatechars:150 }}</p><small>{% if aporte.revisado %}Revisado{% else %}Pendiente de revisión{% endif %}</small></article>{% endfor %}</div>{% else %}<div class="account-empty"><p>Todavía no has enviado aportes.</p><a href="/#contribuir">Compartir mi primer conocimiento</a></div>{% endif %}</div>
