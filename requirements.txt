@@ -1,5 +1,5 @@
 Django>=5.2,<5.3
-django-allauth[socialaccount]>=65.18,<66.0
+django-allauth[socialaccount,mfa]>=65.18,<66.0
 dj-database-url>=3.0,<4.0
 gunicorn>=23.0,<24.0
 psycopg[binary]>=3.2,<4.0

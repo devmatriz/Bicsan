@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
   <main class="auth-shell">
@@ -30,5 +31,6 @@
 
     <p class="auth-back"><a href="/">← Volver a la biblioteca</a></p>
   </main>
+  {% block extra_body %}{% endblock %}
 </body>
 </html>

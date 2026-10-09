@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    "allauth.mfa",
     "aportes",
 ]
 
@@ -127,6 +128,11 @@ ACCOUNT_RATE_LIMITS = {
     "signup": "5/1h/ip",
     "reset_password": "5/1h/ip",
 }
+# Autenticación de dos factores (TOTP con app autenticadora + códigos de recuperación).
+MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
+MFA_TOTP_ISSUER = "BICSAN"
+MFA_RECOVERY_CODE_COUNT = 10
+
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_PROVIDERS = {
@@ -176,3 +182,30 @@ SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 X_FRAME_OPTIONS = "DENY"
+SECURE_REFERRER_POLICY = "same-origin"
+
+# Control de sesión: expira tras 30 minutos de inactividad o al cerrar el navegador.
+SESSION_COOKIE_AGE = int(os.environ.get("SESSION_COOKIE_AGE", 60 * 30))
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+ACCOUNT_SESSION_REMEMBER = False
+
+# Registro de errores y eventos de seguridad en consola (Render los guarda).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "{asctime} [{levelname}] {name}: {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+    },
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {
+        "django.request": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "aportes": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+}
