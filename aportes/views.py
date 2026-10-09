@@ -7,7 +7,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
-from .models import Aporte
+from .models import Aporte, Comunidad
 
 
 PAGINAS = {
@@ -63,13 +63,19 @@ def crear_aporte(request):
     if len(mensaje) > 5000:
         errores["message"] = "El aporte no puede superar 5000 caracteres."
 
+    comunidad_obj = None
+    if comunidad and "community" not in errores:
+        comunidad_obj = Comunidad.objects.filter(nombre__iexact=comunidad).first()
+        if comunidad_obj is None:
+            errores["community"] = "Selecciona una comunidad de la lista."
+
     if errores:
         return JsonResponse({"ok": False, "errors": errores}, status=400)
 
     aporte = Aporte.objects.create(
         usuario=request.user,
         nombre=nombre,
-        comunidad=comunidad,
+        comunidad=comunidad_obj,
         mensaje=mensaje,
     )
     return JsonResponse({"ok": True, "id": aporte.pk}, status=201)

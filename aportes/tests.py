@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from .models import Aporte
+from .models import Aporte, Comunidad, Region
 
 
 class SitioTests(TestCase):
@@ -52,7 +52,7 @@ class SitioTests(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(
             reverse("crear_aporte"),
-            {"name": "Maria", "community": "Miskitu", "message": "Relato comunitario"},
+            {"name": "Maria", "community": "Mískitu", "message": "Relato comunitario"},
         )
         self.assertEqual(response.status_code, 201)
         self.assertTrue(response.json()["ok"])
@@ -64,6 +64,23 @@ class SitioTests(TestCase):
         response = self.client.post(reverse("crear_aporte"), {"name": "Maria"})
         self.assertEqual(response.status_code, 400)
         self.assertFalse(response.json()["ok"])
+
+    def test_rechazar_comunidad_inexistente(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("crear_aporte"),
+            {"name": "Maria", "community": "Inventada", "message": "Relato"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("community", response.json()["errors"])
+        self.assertEqual(Aporte.objects.count(), 0)
+
+    def test_catalogo_de_comunidades(self):
+        self.assertEqual(Region.objects.count(), 4)
+        self.assertEqual(Comunidad.objects.count(), 10)
+        self.assertEqual(
+            Comunidad.objects.get(nombre="Mískitu").region.nombre, "Costa Caribe Norte"
+        )
 
     def test_aporte_requiere_cuenta(self):
         response = self.client.post(
